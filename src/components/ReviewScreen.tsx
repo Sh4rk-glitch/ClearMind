@@ -30,12 +30,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({ items, onConfirm, on
       <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white/80 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/4359/4359295.png" 
-              alt="Sparkles" 
-              className="w-6 h-6 invert brightness-0" 
-              referrerPolicy="no-referrer"
-            />
+            <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-xl font-black">Review Results</h2>
@@ -43,24 +38,14 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({ items, onConfirm, on
           </div>
         </div>
         <button onClick={onCancel} className="p-2 text-slate-400 hover:text-rose-500 transition-colors">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" 
-            alt="Close" 
-            className="w-6 h-6 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <X className="w-6 h-6 opacity-40" />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/564/564619.png" 
-              alt="Alert" 
-              className="w-12 h-12 opacity-20" 
-              referrerPolicy="no-referrer"
-            />
+            <AlertCircle className="w-12 h-12 text-slate-300 opacity-20" />
             <p className="text-slate-500">No items were extracted. Try being more descriptive.</p>
           </div>
         ) : (

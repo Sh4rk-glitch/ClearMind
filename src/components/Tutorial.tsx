@@ -46,19 +46,14 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 flex flex-col font-sans">
       <div className="flex justify-end p-6">
         <button 
           onClick={onComplete}
           className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1 text-sm font-medium"
         >
           Skip 
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" 
-            alt="Close" 
-            className="w-4 h-4 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <X className="w-4 h-4 opacity-40" />
         </button>
       </div>
 
@@ -108,12 +103,7 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete }) => {
           className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-xl shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
         >
           {currentSlide === slides.length - 1 ? "Get Started" : "Next"}
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-            alt="Next" 
-            className="w-5 h-5 invert brightness-0" 
-            referrerPolicy="no-referrer"
-          />
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

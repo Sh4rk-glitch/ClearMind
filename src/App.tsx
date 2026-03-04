@@ -12,6 +12,7 @@ import {
   LayoutGrid,
   BrainCircuit
 } from 'lucide-react';
+import { callAI } from './services/aiClient';
 import { ThoughtItem, AppState, UserInsights, PersonalizationData, PersonalizationEntry } from './types';
 import { organizeThoughts, calculateOverwhelmScore, OrganizationResult } from './services/ai';
 import { generateUserInsights } from './services/insightService';
@@ -41,6 +42,7 @@ export default function App() {
   const [userInsights, setUserInsights] = useState<UserInsights | undefined>();
   const [personalization, setPersonalization] = useState<PersonalizationData | undefined>();
   const [isRefreshingInsights, setIsRefreshingInsights] = useState(false);
+  const [quickTip, setQuickTip] = useState<string>("Your thoughts are like clouds passing in the sky. You are the sky, not the clouds.");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('clearmind_theme');
@@ -57,6 +59,35 @@ export default function App() {
   const [chatItem, setChatItem] = useState<ThoughtItem | null>(null);
 
   // Load data on mount
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('clearmind_theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    const fetchNewTip = async () => {
+      try {
+        const text = await callAI({
+          messages: [{ role: 'user', content: "Generate a short, calming, and insightful mental clarity tip or quote (max 15 words). Return only the text." }],
+          systemInstruction: "You are a mindful assistant providing quick tips for mental clarity and peace."
+        });
+        if (text) {
+          setQuickTip(text.trim().replace(/^"|"$/g, ''));
+        }
+      } catch (error) {
+        console.error("Failed to fetch tip:", error);
+      }
+    };
+
+    fetchNewTip();
+    const interval = setInterval(fetchNewTip, 5 * 60 * 1000); // 5 minutes
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -300,48 +331,52 @@ export default function App() {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className="space-y-6 h-full flex flex-col"
+      className="fixed inset-0 z-[60] bg-white dark:bg-slate-950 p-6 flex flex-col"
     >
-      <div className="flex items-center gap-4">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+      <div className="flex items-center gap-4 mb-6">
+        <button onClick={() => setView('home')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
           <ChevronLeft className="w-6 h-6" />
         </button>
         <h2 className="text-2xl font-bold">Brain Dump</h2>
       </div>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 flex flex-col relative overflow-hidden">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="What's on your mind? Type everything out—tasks, worries, random ideas..."
-          className="w-full h-full p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border-none focus:ring-2 focus:ring-indigo-500 resize-none text-lg leading-relaxed text-slate-900 dark:text-slate-100"
+          className="w-full flex-1 p-6 bg-slate-50 dark:bg-slate-900 rounded-[32px] border-none focus:ring-2 focus:ring-indigo-500 resize-none text-lg leading-relaxed text-slate-900 dark:text-slate-100 transition-all duration-300"
           autoFocus
         />
-        <button className="absolute bottom-6 right-6 p-4 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 text-indigo-500">
-          <Mic className="w-6 h-6" />
-        </button>
+        <div className="absolute bottom-6 right-6 flex gap-3">
+          <button className="p-4 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 text-indigo-500 hover:scale-110 transition-transform">
+            <Mic className="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
-      <button
-        onClick={() => handleOrganize()}
-        disabled={isProcessing || !input.trim()}
-        className={cn(
-          "w-full py-4 rounded-2xl font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2",
-          isProcessing ? "bg-slate-400" : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
-        )}
-      >
-        {isProcessing ? (
-          <>
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Organizing...
-          </>
-        ) : (
-          <>
-            <Sparkles className="w-5 h-5" />
-            Organize My Thoughts
-          </>
-        )}
-      </button>
+      <div className="mt-6">
+        <button
+          onClick={() => handleOrganize()}
+          disabled={isProcessing || !input.trim()}
+          className={cn(
+            "w-full py-5 rounded-[24px] font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2",
+            isProcessing ? "bg-slate-400" : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
+          )}
+        >
+          {isProcessing ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Organizing...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5" />
+              Organize My Thoughts
+            </>
+          )}
+        </button>
+      </div>
     </motion.div>
   );
 
@@ -502,16 +537,11 @@ export default function App() {
           className="p-6 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl text-left border border-slate-100 dark:border-slate-700"
         >
           <h4 className="font-bold text-indigo-600 dark:text-indigo-400 mb-1 flex items-center gap-2">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/4359/4359295.png" 
-              alt="Sparkles" 
-              className="w-4 h-4" 
-              referrerPolicy="no-referrer"
-            />
+            <Sparkles className="w-4 h-4" />
             Quick Tip
           </h4>
           <p className="text-slate-600 dark:text-slate-400 text-sm italic">
-            "Your thoughts are like clouds passing in the sky. You are the sky, not the clouds."
+            "{quickTip}"
           </p>
         </motion.div>
       </div>
@@ -542,12 +572,15 @@ export default function App() {
 
       <div className="max-w-md mx-auto px-6 py-8 pb-24">
         <header className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setView('home')}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Brain className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">ClearMind</h1>
-          </div>
+          </button>
           <button 
             onClick={() => setView(view === 'settings' ? 'home' : 'settings')}
             className={cn(
@@ -608,12 +641,7 @@ export default function App() {
                 className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[32px] p-8 shadow-2xl space-y-6"
               >
                 <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center">
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/4359/4359295.png" 
-                    alt="Sparkles" 
-                    className="w-6 h-6" 
-                    referrerPolicy="no-referrer"
-                  />
+                  <Sparkles className="w-6 h-6 text-indigo-600" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-bold">MindAI needs clarity</h3>

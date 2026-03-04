@@ -168,12 +168,7 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
       {/* Footer Info */}
       <div className="py-4 px-6 text-center">
         <div className="flex items-center justify-center gap-2 text-slate-400 mb-2">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" 
-            alt="Brain" 
-            className="w-4 h-4 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <Brain className="w-4 h-4 opacity-40" />
           <span className="text-xs font-medium">MindAI learns with every answer</span>
         </div>
         <p className="text-[10px] text-slate-300 uppercase tracking-widest">

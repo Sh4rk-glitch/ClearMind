@@ -81,12 +81,7 @@ export const BreathingExercise: React.FC = () => {
           className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-indigo-500 transition-colors"
         >
           {currentTech.name} 
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/271/271210.png" 
-            alt="Down" 
-            className={cn("w-3 h-3 transition-transform opacity-40", showMenu && "rotate-180")} 
-            referrerPolicy="no-referrer"
-          />
+          <ChevronDown className={cn("w-3 h-3 transition-transform opacity-40", showMenu && "rotate-180")} />
         </button>
         
         <AnimatePresence>
@@ -169,32 +164,13 @@ export const BreathingExercise: React.FC = () => {
             isActive ? "bg-slate-100 dark:bg-slate-800 text-slate-600" : "bg-indigo-600 text-white"
           )}
         >
-          {isActive ? (
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/64/64595.png" 
-              alt="Pause" 
-              className="w-6 h-6 opacity-60" 
-              referrerPolicy="no-referrer"
-            />
-          ) : (
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/727/727245.png" 
-              alt="Play" 
-              className="w-6 h-6 invert brightness-0" 
-              referrerPolicy="no-referrer"
-            />
-          )}
+          {isActive ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
         </button>
         <button
           onClick={reset}
           className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center transition-all active:scale-90 hover:text-slate-600"
         >
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/563/563237.png" 
-            alt="Reset" 
-            className="w-6 h-6 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <RotateCcw className="w-6 h-6" />
         </button>
       </div>
     </div>

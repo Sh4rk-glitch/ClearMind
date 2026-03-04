@@ -6,11 +6,11 @@ import { cn } from '../lib/utils';
 type GroundingType = '54321' | 'bodyscan' | 'safeplace' | 'colorfinding';
 
 const sensorySteps = [
-  { id: 5, label: "Things you can see", icon: <img src="https://cdn-icons-png.flaticon.com/512/709/709612.png" alt="See" className="w-5 h-5" referrerPolicy="no-referrer" />, count: 5, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
-  { id: 4, label: "Things you can touch", icon: <img src="https://cdn-icons-png.flaticon.com/512/2921/2921226.png" alt="Touch" className="w-5 h-5" referrerPolicy="no-referrer" />, count: 4, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
-  { id: 3, label: "Things you can hear", icon: <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Hear" className="w-5 h-5" referrerPolicy="no-referrer" />, count: 3, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/20" },
-  { id: 2, label: "Things you can smell", icon: <img src="https://cdn-icons-png.flaticon.com/512/2675/2675848.png" alt="Smell" className="w-5 h-5" referrerPolicy="no-referrer" />, count: 2, color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-900/20" },
-  { id: 1, label: "Thing you can taste", icon: <img src="https://cdn-icons-png.flaticon.com/512/2737/2737034.png" alt="Taste" className="w-5 h-5" referrerPolicy="no-referrer" />, count: 1, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/20" },
+  { id: 5, label: "Things you can see", icon: <Eye className="w-5 h-5" />, count: 5, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
+  { id: 4, label: "Things you can touch", icon: <Hand className="w-5 h-5" />, count: 4, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+  { id: 3, label: "Things you can hear", icon: <Volume2 className="w-5 h-5" />, count: 3, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/20" },
+  { id: 2, label: "Things you can smell", icon: <Wind className="w-5 h-5" />, count: 2, color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-900/20" },
+  { id: 1, label: "Thing you can taste", icon: <Utensils className="w-5 h-5" />, count: 1, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/20" },
 ];
 
 export const GroundingExercise: React.FC = () => {
@@ -33,23 +33,13 @@ export const GroundingExercise: React.FC = () => {
         className="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-indigo-200 transition-all text-left group"
       >
         <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/1042/1042339.png" 
-            alt="Zap" 
-            className="w-6 h-6" 
-            referrerPolicy="no-referrer"
-          />
+          <Zap className="w-6 h-6 text-indigo-500" />
         </div>
         <div className="flex-1">
           <h4 className="font-bold text-slate-800 dark:text-white">5-4-3-2-1 Sensory</h4>
           <p className="text-xs text-slate-400">Connect with your immediate environment.</p>
         </div>
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-          alt="Next" 
-          className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" 
-          referrerPolicy="no-referrer"
-        />
+        <ArrowRight className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" />
       </button>
 
       <button 
@@ -57,23 +47,13 @@ export const GroundingExercise: React.FC = () => {
         className="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-emerald-200 transition-all text-left group"
       >
         <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/709/709612.png" 
-            alt="Eye" 
-            className="w-6 h-6" 
-            referrerPolicy="no-referrer"
-          />
+          <Eye className="w-6 h-6 text-emerald-500" />
         </div>
         <div className="flex-1">
           <h4 className="font-bold text-slate-800 dark:text-white">Color Finding</h4>
           <p className="text-xs text-slate-400">Spot colors around you to stay present.</p>
         </div>
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-          alt="Next" 
-          className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" 
-          referrerPolicy="no-referrer"
-        />
+        <ArrowRight className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" />
       </button>
 
       <button 
@@ -81,23 +61,13 @@ export const GroundingExercise: React.FC = () => {
         className="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-indigo-200 transition-all text-left group"
       >
         <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/833/833472.png" 
-            alt="Heart" 
-            className="w-6 h-6" 
-            referrerPolicy="no-referrer"
-          />
+          <Heart className="w-6 h-6 text-rose-500" />
         </div>
         <div className="flex-1">
           <h4 className="font-bold text-slate-800 dark:text-white">Body Scan</h4>
           <p className="text-xs text-slate-400">Release tension from head to toe.</p>
         </div>
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-          alt="Next" 
-          className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" 
-          referrerPolicy="no-referrer"
-        />
+        <ArrowRight className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" />
       </button>
 
       <button 
@@ -105,23 +75,13 @@ export const GroundingExercise: React.FC = () => {
         className="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-indigo-200 transition-all text-left group"
       >
         <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/1271/1271380.png" 
-            alt="Shield" 
-            className="w-6 h-6" 
-            referrerPolicy="no-referrer"
-          />
+          <ShieldCheck className="w-6 h-6 text-blue-500" />
         </div>
         <div className="flex-1">
           <h4 className="font-bold text-slate-800 dark:text-white">Safe Place Visualization</h4>
           <p className="text-xs text-slate-400">Create a mental sanctuary of peace.</p>
         </div>
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-          alt="Next" 
-          className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" 
-          referrerPolicy="no-referrer"
-        />
+        <ArrowRight className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" />
       </button>
     </div>
   );
@@ -135,12 +95,7 @@ export const GroundingExercise: React.FC = () => {
           className="text-center py-12 space-y-6"
         >
           <div className="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/1271/1271380.png" 
-              alt="Shield" 
-              className="w-12 h-12" 
-              referrerPolicy="no-referrer"
-            />
+            <ShieldCheck className="w-12 h-12 text-emerald-600" />
           </div>
           <div className="space-y-2">
             <h3 className="text-2xl font-bold">You are grounded.</h3>
@@ -203,12 +158,7 @@ export const GroundingExercise: React.FC = () => {
             >
               {i < tappedCount ? (
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/1271/1271380.png" 
-                    alt="Shield" 
-                    className="w-8 h-8" 
-                    referrerPolicy="no-referrer"
-                  />
+                  <ShieldCheck className="w-8 h-8 text-emerald-500" />
                 </motion.div>
               ) : i + 1}
             </motion.button>
@@ -225,12 +175,7 @@ export const GroundingExercise: React.FC = () => {
   const renderBodyScan = () => (
     <div className="py-8 space-y-8 text-center">
       <div className="w-24 h-24 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/833/833472.png" 
-          alt="Heart" 
-          className="w-12 h-12 animate-pulse" 
-          referrerPolicy="no-referrer"
-        />
+        <Heart className="w-12 h-12 text-rose-500 animate-pulse" />
       </div>
       <div className="space-y-4">
         <h3 className="text-2xl font-black">Body Scan</h3>
@@ -248,12 +193,7 @@ export const GroundingExercise: React.FC = () => {
         ))}
       </div>
       <button onClick={reset} className="text-slate-400 font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 mx-auto">
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/563/563237.png" 
-          alt="Reset" 
-          className="w-4 h-4 opacity-40" 
-          referrerPolicy="no-referrer"
-        /> Back to Menu
+        <RefreshCw className="w-4 h-4 opacity-40" /> Back to Menu
       </button>
     </div>
   );
@@ -261,12 +201,7 @@ export const GroundingExercise: React.FC = () => {
   const renderSafePlace = () => (
     <div className="py-8 space-y-8 text-center">
       <div className="w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/1271/1271380.png" 
-          alt="Shield" 
-          className="w-12 h-12" 
-          referrerPolicy="no-referrer"
-        />
+        <ShieldCheck className="w-12 h-12 text-blue-500" />
       </div>
       <div className="space-y-4">
         <h3 className="text-2xl font-black">Safe Place</h3>
@@ -286,12 +221,7 @@ export const GroundingExercise: React.FC = () => {
         </div>
       </div>
       <button onClick={reset} className="text-slate-400 font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 mx-auto">
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/563/563237.png" 
-          alt="Reset" 
-          className="w-4 h-4 opacity-40" 
-          referrerPolicy="no-referrer"
-        /> Back to Menu
+        <RefreshCw className="w-4 h-4 opacity-40" /> Back to Menu
       </button>
     </div>
   );
@@ -330,12 +260,7 @@ export const GroundingExercise: React.FC = () => {
           className="px-8 py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-2xl font-bold shadow-lg flex items-center gap-2 mx-auto"
         >
           I found it 
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-            alt="Next" 
-            className="w-4 h-4 invert brightness-0 dark:invert-0" 
-            referrerPolicy="no-referrer"
-          />
+          <ArrowRight className="w-4 h-4" />
         </button>
         <div className="flex justify-center gap-2">
           {COLORS.map((_, i) => (

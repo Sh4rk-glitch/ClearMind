@@ -140,12 +140,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         >
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-              <img 
-                src="https://cdn-icons-png.flaticon.com/512/4359/4359295.png" 
-                alt="Sparkles" 
-                className="w-6 h-6 invert brightness-0" 
-                referrerPolicy="no-referrer"
-              />
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div className="text-left">
               <p className="font-bold text-lg">Train MindAI</p>
@@ -171,12 +166,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="p-4 flex items-center justify-between border-b border-slate-50 dark:border-slate-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
-                <img 
-                  src={isDarkMode ? "https://cdn-icons-png.flaticon.com/512/180/180700.png" : "https://cdn-icons-png.flaticon.com/512/869/869869.png"} 
-                  alt="Theme" 
-                  className="w-5 h-5" 
-                  referrerPolicy="no-referrer"
-                />
+                {isDarkMode ? <Moon className="w-5 h-5 text-indigo-400" /> : <Sun className="w-5 h-5 text-amber-500" />}
               </div>
               <div>
                 <p className="text-sm font-bold">Dark Mode</p>
@@ -204,12 +194,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               className="w-full p-4 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors text-left"
             >
               <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 rounded-xl flex items-center justify-center">
-                <img 
-                  src="https://cdn-icons-png.flaticon.com/512/3221/3221803.png" 
-                  alt="Trash" 
-                  className="w-5 h-5" 
-                  referrerPolicy="no-referrer"
-                />
+                <Trash2 className="w-5 h-5 text-rose-500" />
               </div>
               <div>
                 <p className="text-sm font-bold text-rose-500">Clear All Data</p>

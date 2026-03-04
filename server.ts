@@ -1,30 +1,50 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables immediately
+const envLocalPath = path.resolve(__dirname, ".env.local");
+dotenv.config({ path: envLocalPath });
+dotenv.config(); // Fallback to .env
+
+console.log("=== SERVER STARTUP ===");
+console.log("Looking for .env.local at:", envLocalPath);
+console.log("File exists:", fs.existsSync(envLocalPath));
+console.log("HACKCLUB_API_KEY found:", !!process.env.HACKCLUB_API_KEY);
+console.log("=======================");
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
-
   app.use(express.json());
 
-  // AI Proxy Route
   app.post("/api/ai", async (req, res) => {
-    const { messages, model = "google/gemini-3-flash-preview", systemInstruction } = req.body;
-    const apiKey = process.env.HACKCLUB_API_KEY;
+    // Check key inside the request to be absolutely sure
+    let apiKey = process.env.HACKCLUB_API_KEY || process.env.GEMINI_API_KEY;
+    
+    console.log("Incoming AI Request. Key present in env:", !!apiKey);
 
     if (!apiKey) {
-      return res.status(500).json({ error: "HACKCLUB_API_KEY is not configured on the server." });
+      return res.status(500).json({ 
+        error: "[VER-3] No API key found in server environment. Please restart your terminal." 
+      });
     }
 
-    const payloadMessages = [...messages];
-    if (systemInstruction) {
-      payloadMessages.unshift({ role: "system", content: systemInstruction });
-    }
+    // Clean the key
+    apiKey = apiKey.trim().replace(/^["']|["']$/g, '');
 
     try {
+      const { messages, model = "google/gemini-1.5-flash", systemInstruction } = req.body;
+      const payloadMessages = [...messages];
+      if (systemInstruction) {
+        payloadMessages.unshift({ role: "system", content: systemInstruction });
+      }
+
       const response = await fetch("https://ai.hackclub.com/proxy/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -38,20 +58,19 @@ async function startServer() {
         }),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        return res.status(response.status).json({ error: "AI Proxy Error", details: errorData });
+        console.error("HackClub Proxy Error:", data);
+        return res.status(response.status).json({ error: "Proxy Error", details: data });
       }
 
-      const data = await response.json();
       res.json(data);
     } catch (error) {
-      console.error("AI Proxy Exception:", error);
-      res.status(500).json({ error: "Internal Server Error during AI request." });
+      console.error("Server Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   });
 
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -60,13 +79,11 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     app.use(express.static("dist"));
-    app.get("*", (req, res) => {
-      res.sendFile("dist/index.html", { root: "." });
-    });
+    app.get("*", (req, res) => res.sendFile("dist/index.html", { root: "." }));
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(3000, "0.0.0.0", () => {
+    console.log("Server running at http://localhost:3000");
   });
 }
 

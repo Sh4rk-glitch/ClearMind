@@ -14,46 +14,12 @@ interface ThoughtCardProps {
 export const ThoughtCard: React.FC<ThoughtCardProps> = ({ item, onToggleComplete, onDelete, onChat }) => {
   const getCategoryIcon = () => {
     switch (item.category) {
-      case 'urgent': return (
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/564/564619.png" 
-          alt="Urgent" 
-          className="w-4 h-4" 
-          referrerPolicy="no-referrer"
-        />
-      );
-      case 'long-term': return (
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/2088/2088617.png" 
-          alt="Long Term" 
-          className="w-4 h-4" 
-          referrerPolicy="no-referrer"
-        />
-      );
-      case 'worry': return (
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/1042/1042339.png" 
-          alt="Worry" 
-          className="w-4 h-4" 
-          referrerPolicy="no-referrer"
-        />
-      );
-      case 'reminder': return (
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/190/190411.png" 
-          alt="Reminder" 
-          className="w-4 h-4" 
-          referrerPolicy="no-referrer"
-        />
-      );
-      case 'outside-control': return (
-        <img 
-          src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" 
-          alt="Outside Control" 
-          className="w-4 h-4 opacity-40" 
-          referrerPolicy="no-referrer"
-        />
-      );
+      case 'urgent': return <AlertCircle className="w-4 h-4 text-rose-500" />;
+      case 'long-term': return <Clock className="w-4 h-4 text-blue-500" />;
+      case 'worry': return <Zap className="w-4 h-4 text-amber-500" />;
+      case 'reminder': return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+      case 'outside-control': return <XCircle className="w-4 h-4 text-slate-400" />;
+      default: return null;
     }
   };
 
@@ -103,12 +69,7 @@ export const ThoughtCard: React.FC<ThoughtCardProps> = ({ item, onToggleComplete
                   onClick={() => onChat(item)}
                   className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
                 >
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/589/589708.png" 
-                    alt="Chat" 
-                    className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100" 
-                    referrerPolicy="no-referrer"
-                  />
+                  <MessageSquare className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100" />
                 </button>
               )}
               {onDelete && (
@@ -121,12 +82,7 @@ export const ThoughtCard: React.FC<ThoughtCardProps> = ({ item, onToggleComplete
                       : "text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
                   )}
                 >
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/3221/3221803.png" 
-                    alt="Trash" 
-                    className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100" 
-                    referrerPolicy="no-referrer"
-                  />
+                  <Trash2 className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100" />
                 </button>
               )}
             </div>
@@ -142,12 +98,7 @@ export const ThoughtCard: React.FC<ThoughtCardProps> = ({ item, onToggleComplete
           {item.actionPlan && item.controllable && !item.isCompleted && (
             <div className="pt-2 border-t border-slate-50 dark:border-slate-800">
               <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 mb-1">
-                <img 
-                  src="https://cdn-icons-png.flaticon.com/512/109/109617.png" 
-                  alt="Next" 
-                  className="w-3 h-3" 
-                  referrerPolicy="no-referrer"
-                />
+                <ArrowRight className="w-3 h-3" />
                 <span className="text-[10px] font-bold uppercase">Next Step</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -155,12 +106,7 @@ export const ThoughtCard: React.FC<ThoughtCardProps> = ({ item, onToggleComplete
               </p>
               <div className="flex gap-3 mt-2">
                 <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/2088/2088617.png" 
-                    alt="Time" 
-                    className="w-3 h-3 opacity-40" 
-                    referrerPolicy="no-referrer"
-                  /> {item.actionPlan.timeEstimate}
+                  <Clock className="w-3 h-3 opacity-40" /> {item.actionPlan.timeEstimate}
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold px-2 py-0.5 rounded",

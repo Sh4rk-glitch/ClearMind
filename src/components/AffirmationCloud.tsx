@@ -107,12 +107,7 @@ export const AffirmationCloud: React.FC = () => {
             }}
             className="text-center cursor-grab active:cursor-grabbing select-none"
           >
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/3413/3413535.png" 
-              alt="Quote" 
-              className="w-10 h-10 mx-auto mb-6 opacity-20" 
-              referrerPolicy="no-referrer"
-            />
+            <Quote className="w-10 h-10 mx-auto mb-6 text-indigo-500 opacity-20" />
             <h3 className="text-xl md:text-2xl font-semibold text-slate-800 dark:text-slate-100 leading-tight italic px-4">
               "{affirmations[index]}"
             </h3>
@@ -124,23 +119,13 @@ export const AffirmationCloud: React.FC = () => {
           onClick={() => paginate(-1)}
           className="absolute left-2 p-2 text-slate-300 hover:text-indigo-500 transition-colors opacity-0 group-hover:opacity-100"
         >
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/271/271220.png" 
-            alt="Left" 
-            className="w-6 h-6 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <ChevronLeft className="w-6 h-6 opacity-40" />
         </button>
         <button 
           onClick={() => paginate(1)}
           className="absolute right-2 p-2 text-slate-300 hover:text-indigo-500 transition-colors opacity-0 group-hover:opacity-100"
         >
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/271/271210.png" 
-            alt="Right" 
-            className="w-6 h-6 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <ChevronRight className="w-6 h-6 opacity-40" />
         </button>
       </div>
 

@@ -65,9 +65,10 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
       });
 
       setMessages(prev => [...prev, { role: 'assistant', text: responseText || "I'm sorry, I couldn't process that." }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat Error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', text: "I'm having trouble connecting right now. Please try again." }]);
+      const errorMsg = error.message || "I'm having trouble connecting right now.";
+      setMessages(prev => [...prev, { role: 'assistant', text: `${errorMsg} Please check your server console for details.` }]);
     } finally {
       setIsLoading(false);
     }
@@ -84,12 +85,7 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
       <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" 
-              alt="Bot" 
-              className="w-6 h-6 invert brightness-0" 
-              referrerPolicy="no-referrer"
-            />
+            <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-lg font-black">Clarity Agent</h2>
@@ -97,12 +93,7 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
           </div>
         </div>
         <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" 
-            alt="Close" 
-            className="w-6 h-6 opacity-40" 
-            referrerPolicy="no-referrer"
-          />
+          <X className="w-6 h-6 opacity-40" />
         </button>
       </div>
 
@@ -119,19 +110,9 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
                 msg.role === 'user' ? 'bg-indigo-100' : 'bg-slate-100 dark:bg-slate-800'
               }`}>
                 {msg.role === 'user' ? (
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/1144/1144760.png" 
-                    alt="User" 
-                    className="w-4 h-4 opacity-60" 
-                    referrerPolicy="no-referrer"
-                  />
+                  <User className="w-4 h-4 text-indigo-600 opacity-60" />
                 ) : (
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" 
-                    alt="Bot" 
-                    className="w-4 h-4 opacity-60" 
-                    referrerPolicy="no-referrer"
-                  />
+                  <Bot className="w-4 h-4 text-slate-600 dark:text-slate-400 opacity-60" />
                 )}
               </div>
               <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
@@ -173,12 +154,7 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
             disabled={!input.trim() || isLoading}
             className="absolute right-2 p-3 bg-indigo-600 text-white rounded-xl disabled:bg-slate-300 transition-all active:scale-95"
           >
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/786/786205.png" 
-              alt="Send" 
-              className="w-4 h-4 invert brightness-0" 
-              referrerPolicy="no-referrer"
-            />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </div>
