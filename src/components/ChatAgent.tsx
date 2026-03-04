@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThoughtItem, PersonalizationData } from '../types';
 import { callAI, AIMessage } from '../services/aiClient';
+import { useNotification } from './Notification';
 import { X, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -17,6 +18,7 @@ interface Message {
 }
 
 export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onClose }) => {
+  const { showNotification } = useNotification();
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', text: `Hi! I'm your clarity assistant. How can I help you with: **"${item.text}"**?` }
   ]);
@@ -68,7 +70,7 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
     } catch (error: any) {
       console.error("Chat Error:", error);
       const errorMsg = error.message || "I'm having trouble connecting right now.";
-      setMessages(prev => [...prev, { role: 'assistant', text: `${errorMsg} Please check your server console for details.` }]);
+      showNotification(errorMsg, "error", true);
     } finally {
       setIsLoading(false);
     }

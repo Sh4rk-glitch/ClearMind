@@ -28,11 +28,14 @@ import { PersonalizationTrainer } from './components/PersonalizationTrainer';
 import { Tutorial } from './components/Tutorial';
 import { cn } from './lib/utils';
 
+import { useNotification } from './components/Notification';
+
 type View = 'home' | 'brain-dump' | 'organized' | 'calm' | 'settings' | 'training';
 
 const STORAGE_KEY = 'clearmind_v2_data';
 
 export default function App() {
+  const { showNotification } = useNotification();
   const [view, setView] = useState<View>('home');
   const [thoughts, setThoughts] = useState<ThoughtItem[]>([]);
   const [input, setInput] = useState('');
@@ -178,8 +181,9 @@ export default function App() {
         setClarificationQuestion(null);
         setClarificationAnswer('');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      showNotification(error.message || "Failed to organize thoughts", "error", true);
     } finally {
       setIsProcessing(false);
     }
@@ -241,7 +245,7 @@ export default function App() {
   const handleRefreshInsights = async () => {
     const entries = personalization?.entries || [];
     if (thoughts.length === 0 && entries.length === 0) {
-      alert("Add some thoughts or answer personalization questions for MindAI to analyze your habits.");
+      showNotification("Add some thoughts or answer personalization questions for MindAI to analyze your habits.", "info", true);
       return;
     }
     setIsRefreshingInsights(true);

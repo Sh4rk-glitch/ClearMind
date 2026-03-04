@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThoughtItem, PersonalizationEntry, PersonalizationData } from '../types';
 import { generateNextPersonalizationQuestion } from '../services/insightService';
+import { useNotification } from './Notification';
 import { ChevronLeft, Sparkles, Send, Loader2, CheckCircle2, Brain } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -18,6 +19,7 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
   onBack,
   onSaveEntry
 }) => {
+  const { showNotification } = useNotification();
   const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +33,9 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
     try {
       const question = await generateNextPersonalizationQuestion(thoughts, entries);
       setCurrentQuestion(question);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      showNotification(error.message || "Failed to generate question", "error", true);
     } finally {
       setIsLoading(false);
     }
