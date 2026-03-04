@@ -1,20 +1,39 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ClearMind 🧠
 
-# Run and deploy your AI Studio app
+ClearMind is a modern, AI-powered mental clarity assistant designed to help you declutter your thoughts, organize your brain dumps, and gain insights into your mental state. Built with a focus on privacy and simplicity, it works as a Progressive Web App (PWA) that you can install directly on your phone.
 
-This contains everything you need to run your app locally.
+## ✨ Features
 
-View your app in AI Studio: https://ai.studio/apps/2322ef94-9073-434e-88d7-ff6751d2b95c
+- **Brain Dump Organization**: Quickly capture your thoughts and let AI categorize them into actionable tasks, worries, or reminders.
+- **AI Insights**: Get empathetic summaries and trend analysis based on your recent thoughts and personalization history.
+- **MindAI Chat**: A dedicated space to talk through your thoughts with a mindful assistant.
+- **Personalization Trainer**: An interactive way for the app to learn about your mental models and values to provide better support.
+- **PWA Support**: "Add to Home Screen" on iOS and Android for a native app experience.
+- **Dark Mode**: A beautiful, high-contrast dark interface designed for focus and calm.
+- **Privacy Focused**: Uses a secure server-side proxy for all AI interactions.
 
-## Run Locally
 
-**Prerequisites:**  Node.js
+## 📱 Mobile Installation (PWA)
 
+ClearMind is designed to be used as a mobile app without needing an app store.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### iOS (Safari)
+1. Open the app URL in Safari.
+2. Tap the **Share** button (square with arrow).
+3. Scroll down and tap **"Add to Home Screen."**
+
+### Android (Chrome)
+1. Open the app URL in Chrome.
+2. Tap the **three dots** in the top right.
+3. Tap **"Install app"** or **"Add to Home screen."**
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion, Lucide Icons.
+- **Backend**: Express (Node.js) with Vite middleware.
+- **AI**: Integrated with Hack Club's AI Proxy (Gemini 1.5 Flash).
+- **Styling**: Modern, responsive UI with custom glassmorphism effects.
+
+## 📄 License
+
+This project is licensed under the MIT License.
