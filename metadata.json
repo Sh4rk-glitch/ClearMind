@@ -1,0 +1,5 @@
+{
+  "name": "ClearMind",
+  "description": "A mental-clarity assistant that turns messy thoughts into structured, actionable clarity.",
+  "requestFramePermissions": ["microphone"]
+}
