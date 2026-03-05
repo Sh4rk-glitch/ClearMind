@@ -13,8 +13,6 @@ interface SettingsViewProps {
   onClearData: () => void;
   onStartTraining: () => void;
   isRefreshing: boolean;
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ 
@@ -24,9 +22,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onRefreshInsights, 
   onClearData,
   onStartTraining,
-  isRefreshing,
-  isDarkMode,
-  onToggleDarkMode
+  isRefreshing
 }) => {
   const [showConfirmClear, setShowConfirmClear] = useState(false);
 
@@ -163,31 +159,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <section className="space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">App Settings</h3>
         <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="p-4 flex items-center justify-between border-b border-slate-50 dark:border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
-                {isDarkMode ? <Moon className="w-5 h-5 text-indigo-400" /> : <Sun className="w-5 h-5 text-amber-500" />}
-              </div>
-              <div>
-                <p className="text-sm font-bold">Dark Mode</p>
-                <p className="text-[10px] text-slate-400">{isDarkMode ? 'Deep Night' : 'Morning Sun'}</p>
-              </div>
-            </div>
-            <button 
-              onClick={onToggleDarkMode}
-              className={cn(
-                "w-12 h-6 rounded-full relative transition-colors duration-300",
-                isDarkMode ? "bg-indigo-600" : "bg-slate-200"
-              )}
-            >
-              <motion.div 
-                animate={{ x: isDarkMode ? 24 : 4 }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
-              />
-            </button>
-          </div>
-
           <div className="relative">
             <button 
               onClick={() => setShowConfirmClear(true)}

@@ -46,14 +46,6 @@ export default function App() {
   const [personalization, setPersonalization] = useState<PersonalizationData | undefined>();
   const [isRefreshingInsights, setIsRefreshingInsights] = useState(false);
   const [quickTip, setQuickTip] = useState<string>("Your thoughts are like clouds passing in the sky. You are the sky, not the clouds.");
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('clearmind_theme');
-      if (saved) return saved === 'dark';
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return false;
-  });
   
   // New states for review and chat
   const [reviewItems, setReviewItems] = useState<Partial<ThoughtItem>[] | null>(null);
@@ -62,15 +54,6 @@ export default function App() {
   const [chatItem, setChatItem] = useState<ThoughtItem | null>(null);
 
   // Load data on mount
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('clearmind_theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
-
   useEffect(() => {
     const fetchNewTip = async () => {
       try {
@@ -135,16 +118,6 @@ export default function App() {
   }, [thoughts, hasSeenTutorial, userInsights, personalization]);
 
   // Apply dark mode class
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('clearmind_theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('clearmind_theme', 'light');
-    }
-  }, [isDarkMode]);
-
   // Auto-refresh insights when data changes significantly
   useEffect(() => {
     const entries = personalization?.entries || [];
@@ -613,8 +586,6 @@ export default function App() {
                 onClearData={handleClearData}
                 onStartTraining={() => setView('training')}
                 isRefreshing={isRefreshingInsights}
-                isDarkMode={isDarkMode}
-                onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
               />
             )}
           </AnimatePresence>
