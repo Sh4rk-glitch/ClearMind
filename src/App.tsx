@@ -99,6 +99,7 @@ export default function App() {
       }
     } else {
       setHasSeenTutorial(false);
+      setPersonalization({ entries: [] });
     }
   }, []);
 
@@ -589,10 +590,10 @@ export default function App() {
         </main>
 
         <AnimatePresence>
-          {view === 'training' && personalization && (
+          {view === 'training' && (
             <PersonalizationTrainer
               thoughts={thoughts}
-              personalization={personalization}
+              personalization={personalization || { entries: [] }}
               onBack={() => setView('settings')}
               onSaveEntry={handleSavePersonalizationEntry}
             />
