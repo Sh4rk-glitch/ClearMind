@@ -26,7 +26,7 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const entries = personalization.entries || [];
+  const entries = personalization?.entries || [];
 
   const fetchNextQuestion = async () => {
     setIsLoading(true);

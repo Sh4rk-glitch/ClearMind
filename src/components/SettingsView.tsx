@@ -89,14 +89,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl space-y-1">
                 <span className="text-[10px] font-bold uppercase text-slate-400">Dominant Focus</span>
                 <p className="text-sm font-bold capitalize text-indigo-600 dark:text-indigo-400">
-                  {insights.dominantCategory.replace('-', ' ')}
+                  {insights.dominantCategory?.replace('-', ' ') || 'General'}
                 </p>
               </div>
               <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl space-y-1">
                 <span className="text-[10px] font-bold uppercase text-slate-400">Overwhelm Trend</span>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold capitalize">{insights.overwhelmTrend}</p>
-                  {getTrendIcon(insights.overwhelmTrend)}
+                  <p className="text-sm font-bold capitalize">{insights.overwhelmTrend || 'Stable'}</p>
+                  {getTrendIcon(insights.overwhelmTrend || 'stable')}
                 </div>
               </div>
             </div>
