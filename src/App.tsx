@@ -326,9 +326,6 @@ export default function App() {
           autoFocus
         />
         <div className="absolute bottom-6 right-6 flex gap-3">
-          <button className="p-4 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 text-indigo-500 hover:scale-110 transition-transform">
-            <Mic className="w-6 h-6" />
-          </button>
         </div>
       </div>
 

@@ -117,7 +117,7 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ item, personalization, onC
                   <Bot className="w-4 h-4 text-slate-600 dark:text-slate-400 opacity-60" />
                 )}
               </div>
-              <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
+              <div className={`p-4 rounded-2xl text-sm leading-relaxed relative group ${
                 msg.role === 'user' 
                   ? 'bg-indigo-600 text-white rounded-tr-none' 
                   : 'bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-100 dark:border-slate-800'
