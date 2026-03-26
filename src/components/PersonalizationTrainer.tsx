@@ -28,7 +28,8 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
 
   const entries = personalization?.entries || [];
 
-  const fetchNextQuestion = async () => {
+  const fetchNextQuestion = async (force = false) => {
+    if (currentQuestion && !force) return;
     setIsLoading(true);
     try {
       const question = await generateNextPersonalizationQuestion(thoughts, entries);
@@ -42,7 +43,9 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
   };
 
   useEffect(() => {
-    fetchNextQuestion();
+    if (!currentQuestion && !isLoading) {
+      fetchNextQuestion();
+    }
   }, []);
 
   const handleSubmit = async () => {
@@ -61,7 +64,8 @@ export const PersonalizationTrainer: React.FC<PersonalizationTrainerProps> = ({
     
     setTimeout(() => {
       setShowSuccess(false);
-      fetchNextQuestion();
+      setCurrentQuestion(null); // Clear current question before fetching next
+      fetchNextQuestion(true);
     }, 1500);
     
     setIsSaving(false);

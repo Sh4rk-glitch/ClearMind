@@ -37,13 +37,31 @@ export interface PersonalizationData {
   preferredSupport?: string;
 }
 
+export interface TimerSession {
+  id: string;
+  task: string;
+  duration: number; // in seconds
+  timestamp: number;
+}
+
 export interface AppState {
   thoughts: ThoughtItem[];
   overwhelmScore: number;
   hasSeenTutorial: boolean;
   userInsights?: UserInsights;
   personalization?: PersonalizationData;
+  timerSessions?: TimerSession[];
+  moodHistory?: MoodEntry[];
 }
 
 export type BreathingTechnique = 'box' | '4-7-8' | 'calm' | 'focus';
 export type GroundingTechnique = '5-4-3-2-1' | 'body-scan' | 'safe-place' | 'color-finding';
+
+export type Mood = 'calm' | 'focused' | 'anxious' | 'overwhelmed' | 'energetic' | 'tired';
+
+export interface MoodEntry {
+  id: string;
+  mood: Mood;
+  note?: string;
+  timestamp: number;
+}

@@ -1,5 +1,5 @@
 {
-  "name": "ClearMind",
-  "description": "A mental-clarity assistant that turns messy thoughts into structured, actionable clarity.",
+  "name": "ClearMindV2",
+  "description": "A high-precision mental clarity and focus tool featuring an authentic analog-style productivity timer.",
   "requestFramePermissions": ["microphone"]
 }

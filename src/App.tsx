@@ -10,10 +10,14 @@ import {
   ChevronLeft,
   Trash2,
   LayoutGrid,
-  BrainCircuit
+  BrainCircuit,
+  Timer as TimerIcon,
+  Zap,
+  RefreshCw
 } from 'lucide-react';
 import { callAI } from './services/aiClient';
-import { ThoughtItem, AppState, UserInsights, PersonalizationData, PersonalizationEntry } from './types';
+import { MoodLogger } from './components/MoodLogger';
+import { ThoughtItem, AppState, UserInsights, PersonalizationData, PersonalizationEntry, TimerSession, MoodEntry } from './types';
 import { organizeThoughts, calculateOverwhelmScore, OrganizationResult } from './services/ai';
 import { generateUserInsights } from './services/insightService';
 import { OverwhelmCircle } from './components/OverwhelmCircle';
@@ -25,14 +29,15 @@ import { ReviewScreen } from './components/ReviewScreen';
 import { ChatAgent } from './components/ChatAgent';
 import { SettingsView } from './components/SettingsView';
 import { PersonalizationTrainer } from './components/PersonalizationTrainer';
+import { AuthenticTimer } from './components/AuthenticTimer';
 import { Tutorial } from './components/Tutorial';
 import { cn } from './lib/utils';
 
 import { useNotification } from './components/Notification';
 
-type View = 'home' | 'brain-dump' | 'organized' | 'calm' | 'settings' | 'training';
+type View = 'home' | 'brain-dump' | 'organized' | 'calm' | 'settings' | 'training' | 'timer';
 
-const STORAGE_KEY = 'clearmind_v2_data';
+const STORAGE_KEY = 'clearmind_v2_data_v3';
 
 export default function App() {
   const { showNotification } = useNotification();
@@ -44,6 +49,8 @@ export default function App() {
   const [hasSeenTutorial, setHasSeenTutorial] = useState<boolean | null>(null);
   const [userInsights, setUserInsights] = useState<UserInsights | undefined>();
   const [personalization, setPersonalization] = useState<PersonalizationData | undefined>();
+  const [timerSessions, setTimerSessions] = useState<TimerSession[]>([]);
+  const [moodHistory, setMoodHistory] = useState<MoodEntry[]>([]);
   const [isRefreshingInsights, setIsRefreshingInsights] = useState(false);
   const [quickTip, setQuickTip] = useState<string>("Your thoughts are like clouds passing in the sky. You are the sky, not the clouds.");
   
@@ -93,6 +100,8 @@ export default function App() {
         setHasSeenTutorial(parsed.hasSeenTutorial ?? false);
         setUserInsights(parsed.userInsights);
         setPersonalization(parsed.personalization || { entries: [] });
+        setTimerSessions(parsed.timerSessions || []);
+        setMoodHistory(parsed.moodHistory || []);
       } catch (e) {
         console.error("Failed to load data", e);
         setHasSeenTutorial(false);
@@ -112,22 +121,24 @@ export default function App() {
       overwhelmScore: calculateOverwhelmScore(thoughts),
       hasSeenTutorial,
       userInsights,
-      personalization
+      personalization,
+      timerSessions,
+      moodHistory
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     setOverwhelmScore(state.overwhelmScore);
-  }, [thoughts, hasSeenTutorial, userInsights, personalization]);
+  }, [thoughts, hasSeenTutorial, userInsights, personalization, timerSessions, moodHistory]);
 
   // Apply dark mode class
   // Auto-refresh insights when data changes significantly
   useEffect(() => {
     const entries = personalization?.entries || [];
-    if (thoughts.length === 0 && entries.length === 0) return;
+    if (thoughts.length === 0 && entries.length === 0 && moodHistory.length === 0) return;
     
     // Debounce to avoid excessive calls
     const timer = setTimeout(async () => {
       try {
-        const insights = await generateUserInsights(thoughts, entries);
+        const insights = await generateUserInsights(thoughts, entries, moodHistory);
         if (insights) {
           setUserInsights(insights);
         }
@@ -137,7 +148,7 @@ export default function App() {
     }, 5000); // 5 second debounce
 
     return () => clearTimeout(timer);
-  }, [thoughts.length, personalization?.entries?.length]);
+  }, [thoughts.length, personalization?.entries?.length, moodHistory.length]);
 
   const handleTutorialComplete = () => {
     setHasSeenTutorial(true);
@@ -209,6 +220,24 @@ export default function App() {
     });
   };
 
+  const handleSaveTimerSession = (session: TimerSession) => {
+    setTimerSessions(prev => [session, ...prev]);
+    showNotification("Focus session recorded.", "success");
+  };
+
+  const handleSaveMood = (entry: MoodEntry) => {
+    setMoodHistory(prev => [entry, ...prev]);
+    showNotification("Mood logged successfully.", "success");
+  };
+
+  const handleClearMoodHistory = () => {
+    setMoodHistory([]);
+  };
+
+  const handleClearTimerHistory = () => {
+    setTimerSessions([]);
+  };
+
   const clearAll = () => {
     if (confirm('Clear all thoughts?')) {
       setThoughts([]);
@@ -218,13 +247,13 @@ export default function App() {
 
   const handleRefreshInsights = async () => {
     const entries = personalization?.entries || [];
-    if (thoughts.length === 0 && entries.length === 0) {
-      showNotification("Add some thoughts or answer personalization questions for MindAI to analyze your habits.", "info", true);
+    if (thoughts.length === 0 && entries.length === 0 && moodHistory.length === 0) {
+      showNotification("MindAI needs some data (thoughts, moods, or answers) to analyze your state.", "info", true);
       return;
     }
     setIsRefreshingInsights(true);
     try {
-      const insights = await generateUserInsights(thoughts, entries);
+      const insights = await generateUserInsights(thoughts, entries, moodHistory);
       if (insights) {
         setUserInsights(insights);
       }
@@ -248,44 +277,156 @@ export default function App() {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20 }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className="space-y-8"
+      className="space-y-12"
     >
-      <div className="flex flex-col items-center pt-8">
-        <OverwhelmCircle score={overwhelmScore} />
-        <p className="mt-4 text-slate-500 text-sm text-center max-w-[200px]">
-          {overwhelmScore > 70 ? "You're carrying a lot. Let's offload some of it." :
-           overwhelmScore > 30 ? "A bit busy today. Want to organize?" :
-           "Your mind seems clear. Great job!"}
-        </p>
+      {/* Brutalist Header Section */}
+      <div className="relative pt-12 pb-8 border-b-2 border-slate-900 dark:border-white">
+        <div className="absolute -top-4 -left-4 text-[120px] font-display opacity-[0.03] dark:opacity-[0.05] pointer-events-none select-none leading-none">
+          {overwhelmScore}
+        </div>
+        <div className="flex flex-col items-start gap-2 relative z-10">
+          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500">Current Load Factor</span>
+          <h2 className="text-7xl font-display uppercase leading-none tracking-tighter">
+            {overwhelmScore}% <span className="text-indigo-600">Overwhelm</span>
+          </h2>
+          <p className="mt-4 text-slate-500 font-medium max-w-xs leading-relaxed">
+            {overwhelmScore > 70 ? "CRITICAL LOAD DETECTED. IMMEDIATE OFFLOAD RECOMMENDED." :
+             overwhelmScore > 30 ? "MODERATE LOAD. OPTIMIZATION ADVISED." :
+             "SYSTEM NOMINAL. MENTAL CLARITY ACHIEVED."}
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <button 
-          onClick={() => setView('brain-dump')}
-          className="flex flex-col items-center justify-center p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl border border-indigo-100 dark:border-indigo-800 transition-all active:scale-95 hover:shadow-xl hover:shadow-indigo-500/10"
+      {/* Action Grid */}
+      <div className="grid grid-cols-1 gap-4">
+        {/* MindAI Overview Card */}
+        {userInsights && (
+          <motion.button 
+            onClick={() => setView('settings')}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-8 bg-indigo-600 text-white rounded-[40px] text-left space-y-4 group active:scale-[0.98] transition-all shadow-xl shadow-indigo-500/20 relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+            
+            <div className="flex justify-between items-center relative z-10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-indigo-200" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-indigo-100 font-bold">MindAI Overview</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRefreshInsights();
+                  }}
+                  disabled={isRefreshingInsights}
+                  className={cn(
+                    "p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all",
+                    isRefreshingInsights && "animate-spin"
+                  )}
+                >
+                  <RefreshCw className="w-3 h-3 text-white" />
+                </button>
+                <div className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  {userInsights.overwhelmTrend}
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2 relative z-10">
+              <h3 className="text-2xl font-display uppercase leading-tight">
+                {userInsights.dominantCategory} <span className="text-indigo-200">Focus</span>
+              </h3>
+              <p className="text-sm text-indigo-50 leading-relaxed font-medium">
+                {userInsights.summary}
+              </p>
+            </div>
+
+            <div className="pt-4 flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-indigo-200 relative z-10">
+              <span>View detailed breakdown</span>
+              <ChevronLeft className="w-3 h-3 rotate-180" />
+            </div>
+          </motion.button>
+        )}
+
+        {/* MindAI Training Card */}
+        <motion.button 
+          onClick={() => setView('training')}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-8 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-white rounded-[40px] text-left space-y-4 group active:scale-[0.98] transition-all relative overflow-hidden"
         >
-          <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center mb-3 shadow-lg shadow-indigo-200 dark:shadow-none">
-            <Plus className="w-6 h-6 text-white" />
+          <div className="flex justify-between items-center relative z-10">
+            <div className="flex items-center gap-2">
+              <BrainCircuit className="w-5 h-5 text-indigo-600" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">MindAI Personalization</span>
+            </div>
+            <div className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-[10px] font-bold uppercase tracking-widest text-indigo-600">
+              {personalization?.entries?.length || 0} Insights
+            </div>
           </div>
-          <span className="font-bold text-indigo-900 dark:text-indigo-100">Brain Dump</span>
-        </button>
+          
+          <div className="space-y-2 relative z-10">
+            <h3 className="text-2xl font-display uppercase leading-tight">
+              Train <span className="text-indigo-600">Your MindAI</span>
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed font-medium">
+              Teach MindAI about your stress triggers, goals, and values to get more precise support.
+            </p>
+          </div>
+
+          <div className="pt-4 flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-indigo-600 relative z-10">
+            <span>Open Training Lab</span>
+            <ChevronLeft className="w-3 h-3 rotate-180" />
+          </div>
+        </motion.button>
 
         <button 
-          onClick={() => setView('calm')}
-          className="flex flex-col items-center justify-center p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-3xl border border-emerald-100 dark:border-emerald-800 transition-all active:scale-95 hover:shadow-xl hover:shadow-emerald-500/10"
+          onClick={() => setView('brain-dump')}
+          className="group relative flex items-center justify-between p-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[32px] overflow-hidden transition-all active:scale-[0.98]"
         >
-          <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center mb-3 shadow-lg shadow-emerald-200 dark:shadow-none">
-            <Wind className="w-6 h-6 text-white" />
+          <div className="relative z-10 flex flex-col items-start text-left">
+            <span className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-2">Primary Input</span>
+            <h3 className="text-3xl font-display uppercase">Brain Dump</h3>
           </div>
-          <span className="font-bold text-emerald-900 dark:text-emerald-100">Calm Mode</span>
+          <div className="relative z-10 w-12 h-12 bg-white/10 dark:bg-black/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+            <Plus className="w-6 h-6" />
+          </div>
+          {/* Decorative Element */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-16 -mt-16" />
         </button>
+
+        <div className="grid grid-cols-2 gap-4">
+          <button 
+            onClick={() => setView('timer')}
+            className="flex flex-col items-start p-6 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-white rounded-[32px] transition-all active:scale-95"
+          >
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center mb-4">
+              <TimerIcon className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500 mb-1">Analog</span>
+            <span className="font-bold text-lg">Focus Timer</span>
+          </button>
+
+          <button 
+            onClick={() => setView('calm')}
+            className="flex flex-col items-start p-6 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-white rounded-[32px] transition-all active:scale-95"
+          >
+            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center mb-4">
+              <Wind className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500 mb-1">Recovery</span>
+            <span className="font-bold text-lg">Calm Mode</span>
+          </button>
+        </div>
       </div>
 
       {thoughts.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Recent Thoughts</h3>
-            <button onClick={() => setView('organized')} className="text-indigo-500 text-sm font-medium">View All</button>
+        <div className="space-y-6">
+          <div className="flex justify-between items-end border-b border-slate-200 dark:border-slate-800 pb-2">
+            <h3 className="font-display text-2xl uppercase tracking-tight">Recent Buffer</h3>
+            <button onClick={() => setView('organized')} className="font-mono text-[10px] uppercase tracking-widest text-indigo-500 font-bold">Access All</button>
           </div>
           <div className="space-y-3">
             {thoughts.slice(0, 3).map(item => (
@@ -545,49 +686,137 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-md mx-auto px-6 py-8 pb-24">
-        <header className="flex justify-between items-center mb-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 pb-32">
+        <header className="flex justify-between items-center mb-12">
           <button 
             onClick={() => setView('home')}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Brain className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-slate-900 dark:bg-white rounded-2xl flex items-center justify-center shadow-2xl">
+              <Zap className="w-7 h-7 text-white dark:text-slate-900" />
             </div>
-            <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">ClearMind</h1>
+            <div className="flex flex-col items-start -space-y-1">
+              <h1 className="text-2xl font-display uppercase tracking-tighter text-slate-900 dark:text-white">ClearMindV2</h1>
+              <span className="font-mono text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em]">Precision Focus</span>
+            </div>
           </button>
-          <button 
-            onClick={() => setView(view === 'settings' ? 'home' : 'settings')}
-            className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-              view === 'settings' 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
-                : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-            )}
-          >
-             <Sparkles className={cn("w-5 h-5", view === 'settings' ? "text-white" : "text-slate-400")} />
-          </button>
+          
+          <div className="flex items-center gap-3">
+          </div>
         </header>
 
-        <main>
-          <AnimatePresence mode="wait">
-            {view === 'home' && renderHome()}
-            {view === 'brain-dump' && renderBrainDump()}
-            {view === 'organized' && renderOrganized()}
-            {view === 'calm' && renderCalm()}
-            {view === 'settings' && (
-              <SettingsView 
-                insights={userInsights}
-                personalization={personalization}
-                onBack={() => setView('home')}
-                onRefreshInsights={handleRefreshInsights}
-                onClearData={handleClearData}
-                onStartTraining={() => setView('training')}
-                isRefreshing={isRefreshingInsights}
-              />
+        <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-12">
+          <main>
+            <AnimatePresence mode="wait">
+              {view === 'home' && renderHome()}
+              {view === 'brain-dump' && renderBrainDump()}
+              {view === 'organized' && renderOrganized()}
+              {view === 'calm' && renderCalm()}
+              {view === 'timer' && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                  className="space-y-8"
+                >
+                  <div className="flex items-center gap-4">
+                    <button onClick={() => setView('home')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <h2 className="text-2xl font-bold">Focus Engine</h2>
+                  </div>
+                  <AuthenticTimer 
+                    sessions={timerSessions}
+                    onSaveSession={handleSaveTimerSession}
+                    onClearHistory={handleClearTimerHistory}
+                  />
+                </motion.div>
+              )}
+              {view === 'settings' && (
+                <SettingsView 
+                  insights={userInsights}
+                  personalization={personalization}
+                  onBack={() => setView('home')}
+                  onRefreshInsights={handleRefreshInsights}
+                  onClearData={handleClearData}
+                  onStartTraining={() => setView('training')}
+                  isRefreshing={isRefreshingInsights}
+                />
+              )}
+            </AnimatePresence>
+          </main>
+
+          <AnimatePresence>
+            {view === 'home' && (
+              <motion.aside
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="hidden lg:block space-y-8"
+              >
+                <MoodLogger 
+                  onSaveMood={handleSaveMood}
+                  moodHistory={moodHistory}
+                  onClearHistory={handleClearMoodHistory}
+                />
+                
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">Quick Stats</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-slate-500">Total Thoughts</span>
+                      <span className="font-mono font-bold">{thoughts.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-slate-500">Focus Sessions</span>
+                      <span className="font-mono font-bold">{timerSessions.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-slate-500">Mood Logs</span>
+                      <span className="font-mono font-bold">{moodHistory.length}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.aside>
             )}
           </AnimatePresence>
-        </main>
+        </div>
+
+        {/* Mobile Mood Logger Trigger */}
+        <AnimatePresence>
+          {view === 'home' && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="lg:hidden mt-12 space-y-8"
+            >
+              <MoodLogger 
+                onSaveMood={handleSaveMood}
+                moodHistory={moodHistory}
+                onClearHistory={handleClearMoodHistory}
+              />
+
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">System Stats</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-display text-indigo-600">{thoughts.length}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Thoughts</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-display text-indigo-600">{timerSessions.length}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Focus</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-display text-indigo-600">{moodHistory.length}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Moods</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {view === 'training' && (
@@ -651,14 +880,14 @@ export default function App() {
         </AnimatePresence>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-xs bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-full p-2 flex justify-around shadow-2xl z-50">
+        <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-sm bg-slate-900/90 dark:bg-white/90 backdrop-blur-xl border border-white/10 dark:border-black/10 rounded-[32px] p-2 flex justify-around shadow-2xl z-50">
           <button 
             onClick={() => setView('home')}
             className={cn(
-              "p-3 rounded-full transition-all active:scale-90", 
+              "p-4 rounded-2xl transition-all active:scale-90", 
               view === 'home' 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/40" 
+                : "text-slate-500 hover:text-slate-300 dark:hover:text-slate-700"
             )}
           >
             <HomeIcon className="w-6 h-6" />
@@ -666,21 +895,32 @@ export default function App() {
           <button 
             onClick={() => setView(view === 'organized' ? 'home' : 'organized')}
             className={cn(
-              "p-3 rounded-full transition-all active:scale-90", 
+              "p-4 rounded-2xl transition-all active:scale-90", 
               view === 'organized' 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/40" 
+                : "text-slate-500 hover:text-slate-300 dark:hover:text-slate-700"
             )}
           >
             <LayoutGrid className="w-6 h-6" />
           </button>
           <button 
+            onClick={() => setView(view === 'timer' ? 'home' : 'timer')}
+            className={cn(
+              "p-4 rounded-2xl transition-all active:scale-90", 
+              view === 'timer' 
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/40" 
+                : "text-slate-500 hover:text-slate-300 dark:hover:text-slate-700"
+            )}
+          >
+            <TimerIcon className="w-6 h-6" />
+          </button>
+          <button 
             onClick={() => setView(view === 'calm' ? 'home' : 'calm')}
             className={cn(
-              "p-3 rounded-full transition-all active:scale-90", 
+              "p-4 rounded-2xl transition-all active:scale-90", 
               view === 'calm' 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
-                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/40" 
+                : "text-slate-500 hover:text-slate-300 dark:hover:text-slate-700"
             )}
           >
             <Wind className="w-6 h-6" />

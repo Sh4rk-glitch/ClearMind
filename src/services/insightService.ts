@@ -1,4 +1,4 @@
-import { ThoughtItem, UserInsights, PersonalizationEntry } from "../types";
+import { ThoughtItem, UserInsights, PersonalizationEntry, MoodEntry } from "../types";
 import { callAI } from "./aiClient";
 
 export const generateNextPersonalizationQuestion = async (
@@ -9,9 +9,10 @@ export const generateNextPersonalizationQuestion = async (
   const historySummary = previousEntries.map(e => `Q: ${e.question}\nA: ${e.answer}`).join('\n\n');
 
   try {
-    const prompt = `You are MindAI, a mental clarity assistant. Your goal is to get to know the user better to provide more personalized support.
+    const prompt = `You are a professional mental clarity and productivity coach. 
+      Your goal is to help the user understand their mental state through thoughtful inquiry.
       
-      Based on the user's recent thoughts and previous personalization answers, generate ONE thoughtful, open-ended question that will help you understand their mental models, values, or specific stress patterns better.
+      Based on the user's recent thoughts and previous answers, generate ONE precise, open-ended question that helps them reflect on their mental models, values, or stress patterns.
       
       User's Recent Thoughts:
       ${thoughtSummary || 'No thoughts yet.'}
@@ -19,12 +20,12 @@ export const generateNextPersonalizationQuestion = async (
       Previous Personalization History:
       ${historySummary || 'No history yet.'}
       
-      Rules:
+      Guidelines:
       1. Ask only ONE question.
-      2. Keep it concise, warm, and empathetic.
-      3. Make it specific to what you've learned about them so far.
-      4. Avoid repeating previous questions.
-      5. Focus on things that help you provide better advice (e.g., "What does a successful day look like to you?" or "When you're overwhelmed, what's the first thing you tend to drop?").`;
+      2. Be professional, grounded, and empathetic. Avoid "weird" or overly abstract language.
+      3. Focus on practical insights (e.g., "What is the most common distraction you face when working on long-term goals?").
+      4. Avoid repetition.
+      5. The question should encourage a concrete, helpful reflection.`;
 
     const responseText = await callAI({
       messages: [{ role: "user", content: prompt }]
@@ -39,28 +40,39 @@ export const generateNextPersonalizationQuestion = async (
 
 export const generateUserInsights = async (
   thoughts: ThoughtItem[],
-  personalizationEntries: PersonalizationEntry[] = []
+  personalizationEntries: PersonalizationEntry[] = [],
+  moodHistory: MoodEntry[] = []
 ): Promise<UserInsights | null> => {
   // Require at least some data to analyze
-  if (thoughts.length === 0 && personalizationEntries.length === 0) return null;
+  if (thoughts.length === 0 && personalizationEntries.length === 0 && moodHistory.length === 0) return null;
 
   const thoughtSummary = thoughts.map(t => `- [${t.category}] ${t.text} (${t.isCompleted ? 'Completed' : 'Pending'})`).join('\n');
   const personalizationSummary = personalizationEntries.map(e => `Q: ${e.question}\nA: ${e.answer}`).join('\n\n');
+  const moodSummary = moodHistory.map(m => `- [${m.mood}] ${m.note || 'No note'} (${new Date(m.timestamp).toLocaleString()})`).join('\n');
 
   try {
-    const prompt = `Analyze the following data from a user's mental clarity app. 
-      Provide a concise, empathetic summary of what "MindAI" thinks of the user's current mental state, habits, and focus areas.
+    const prompt = `You are a professional mental clarity analyst. 
+      Analyze the following data from a user's mental clarity app. 
+      Provide a precise, professional, and empathetic summary of their current mental state, habits, and focus areas.
       
       User Thoughts:
       ${thoughtSummary || 'No thoughts recorded yet.'}
       
       MindAI Personalization History:
       ${personalizationSummary || 'No personalization history yet.'}
+
+      Mood History:
+      ${moodSummary || 'No mood entries recorded yet.'}
+      
+      Guidelines:
+      1. Be objective and grounded. Do not use "weird" or overly poetic language.
+      2. Provide a 3-4 sentence summary that is genuinely helpful and insightful, connecting their thoughts, moods, and habits.
+      3. Accurately identify the dominant category and overwhelm trend.
       
       Return a JSON object with the following structure:
       {
-        "summary": "A 2-3 sentence empathetic summary of the user's current state.",
-        "dominantCategory": "The most frequent category of thoughts (or 'Personal Growth' if based mainly on personalization).",
+        "summary": "A 3-4 sentence professional summary of the user's current state.",
+        "dominantCategory": "The most frequent category of thoughts.",
         "overwhelmTrend": "improving" | "stable" | "increasing"
       }`;
 

@@ -8,16 +8,19 @@ export interface OrganizationResult {
 
 export async function organizeThoughts(input: string, context?: string): Promise<OrganizationResult> {
   try {
-    const prompt = `Organize the following brain dump into structured items. 
+    const prompt = `You are a highly professional mental clarity and productivity assistant. 
+    Your task is to organize a user's "brain dump" into a structured, actionable format.
+    
     Input: "${input}"
     ${context ? `Additional Context from user's previous answer: "${context}"` : ""}
     
-    Rules:
-    1. Break long sentences into individual actionable items or worries.
-    2. Categorize accurately.
-    3. Determine if it's within the user's control.
-    4. For actionable items, provide a clear, tiny next step.
-    5. If the input is extremely vague (e.g., just "work" or "stuff"), ask for more detail using the clarificationQuestion field.
+    Guidelines:
+    1. Be precise and objective. Do not add unnecessary fluff or "weird" interpretations.
+    2. Break complex thoughts into simple, discrete items.
+    3. Categorize each item accurately based on its nature.
+    4. For controllable items, provide a "tiny next step" that is practical and takes less than 10 minutes.
+    5. If the input is too vague to be useful, use the "clarificationQuestion" to ask a specific, helpful question.
+    6. Ensure the tone is calm, professional, and supportive.
 
     Return a JSON object with this structure:
     {

@@ -27,6 +27,18 @@ const slides = [
     color: "bg-blue-50 dark:bg-blue-900/20"
   },
   {
+    title: "MindAI Training",
+    description: "Train your personal AI by answering questions. The more you share, the better it understands your stress triggers.",
+    icon: <Brain className="w-12 h-12 text-purple-600" />,
+    color: "bg-purple-50 dark:bg-purple-900/20"
+  },
+  {
+    title: "Mood Tracking",
+    description: "Log your mood to see how your emotional state correlates with your productivity and thoughts.",
+    icon: <Sparkles className="w-12 h-12 text-rose-600" />,
+    color: "bg-rose-50 dark:bg-rose-900/20"
+  },
+  {
     title: "Find Your Calm",
     description: "When things feel like too much, use Calm Mode for guided breathing and grounding exercises.",
     icon: <Wind className="w-12 h-12 text-emerald-600" />,
