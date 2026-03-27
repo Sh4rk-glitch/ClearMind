@@ -290,9 +290,9 @@ export default function App() {
             {overwhelmScore}% <span className="text-indigo-600">Overwhelm</span>
           </h2>
           <p className="mt-4 text-slate-500 font-medium max-w-xs leading-relaxed">
-            {overwhelmScore > 70 ? "CRITICAL LOAD DETECTED. IMMEDIATE OFFLOAD RECOMMENDED." :
-             overwhelmScore > 30 ? "MODERATE LOAD. OPTIMIZATION ADVISED." :
-             "SYSTEM NOMINAL. MENTAL CLARITY ACHIEVED."}
+            {overwhelmScore > 70 ? "You might be overwelhed, consider taking a break or using Calm Mode." :
+             overwhelmScore > 30 ? "You're feeling a bit overwhelmed, but you can manage it." :
+             "You're doing great! Keep up the good work."}
           </p>
         </div>
       </div>
@@ -697,7 +697,7 @@ export default function App() {
             </div>
             <div className="flex flex-col items-start -space-y-1">
               <h1 className="text-2xl font-display uppercase tracking-tighter text-slate-900 dark:text-white">ClearMindV2</h1>
-              <span className="font-mono text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em]">Precision Focus</span>
+              <span className="font-mono text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em]">Lets clear your mind.</span>
             </div>
           </button>
           
